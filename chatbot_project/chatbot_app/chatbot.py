@@ -1,25 +1,34 @@
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, pipeline
 
 
-class FlanT5Chatbot:
+class ChatBot:
     def __init__(self):
-        self.tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-base")
-        self.model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base")
+        self.model_name = "google/flan-t5-base"
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
 
-    # Modify the get_response method in chatbot.py to include a context-enhanced prompt
-    def get_response(self, input_text):
-        # Enhancing the Prompt
-        enhanced_prompt = f"Please provide supportive and clear guidance. The user has asked: '{input_text}'. Your response should be empathetic and informative."
-
-        # Encode the enhanced_prompt
-        input_ids = self.tokenizer.encode(enhanced_prompt, return_tensors="pt")
-
-        # Generate a response
+    def get_response(self, context):
+        # Encode and generate response
+        context_ids = self.tokenizer.encode(context, return_tensors="pt")
         output_ids = self.model.generate(
-            input_ids, max_length=100, num_return_sequences=1
+            context_ids,
+            max_length=512,
+            num_return_sequences=1,
+            temperature=0.7,
+            do_sample=True,
         )
-
-        # Decode the response
         response = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
 
         return response
+
+
+class SummaryBot:
+    def __init__(self):
+        self.summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+
+    def get_response(self, context):
+        response = self.summarizer(
+            context, max_length=130, min_length=10, do_sample=False
+        )
+
+        return response[0]["summary_text"]

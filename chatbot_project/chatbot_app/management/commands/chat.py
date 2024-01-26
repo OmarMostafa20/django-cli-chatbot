@@ -1,68 +1,117 @@
 from django.core.management.base import BaseCommand
 from chatbot_app.models import Customer, ChatMessage, Complaint
-from chatbot_app.chatbot import FlanT5Chatbot
+from chatbot_app.chatbot import ChatBot, SummaryBot
 import re
-import uuid
 
 
 class Command(BaseCommand):
-    help = "Start the chatbot CLI"
-
     def handle(self, *args, **kwargs):
-        chatbot = FlanT5Chatbot()
-        print("Welcome to the Chatbot CLI. Let's begin by collecting some information.")
+        ### Define Model
+        chatBot = ChatBot()
+        summaryBot = SummaryBot()
 
-        # Collect customer information
-        name = input("Please enter your name: ")
-        email = input("Please enter your email: ")
-        phone_number = input("Please enter your phone number: ")
+        #############################################################################################################
+
+        ### Welcome Messages
+        print("🌟 Welcome to our CLIBot Service! 🌟")
+        print("Let's get started by gathering some basic information from you.")
+
+        #############################################################################################################
+
+        ### User Data
+
+        # Name Input
+        name = input("Please enter your full name: ")
+
+        # Email Input With Validation Loop
+        email = ""
+        while not email:
+            email_input = input("Please enter your email address: ")
+            if re.match(r"[^@]+@[^@]+\.[^@]+", email_input):
+                email = email_input
+            else:
+                print("The email address format seems incorrect. Please try again.")
+
+        # Phone Number Input With Validation Loop
+        phone_number = ""
+        while not phone_number:
+            phone_input = input("Please enter your phone number: ")
+            if re.match(r"\d{10,15}", phone_input):
+                phone_number = phone_input
+            else:
+                print(
+                    "The phone number format seems incorrect. Please enter a valid number."
+                )
+
+        # Address Input
         address = input("Please enter your address: ")
 
-        # Validate email and phone number (basic validation)
-        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            print("Invalid email format.")
-            return
-        if not re.match(r"\d{10,15}", phone_number):
-            print("Invalid phone number format.")
-            return
+        #############################################################################################################
 
-        # Create or update customer information
-        customer, created = Customer.objects.get_or_create(
+        # Create Customer into DataBase
+        customer, _ = Customer.objects.get_or_create(
             email=email,
             defaults={"name": name, "phone_number": phone_number, "address": address},
         )
-        if not created:
-            Customer.objects.filter(email=email).update(
-                name=name, phone_number=phone_number, address=address
-            )
 
-        # Start chat loop
-        print("You can start chatting now. Type 'quit' to exit.")
+        #############################################################################################################
+
+        # Start Chatting
+
+        print(
+            "\n--- CLIBot ---\nHi! I'm CLIBot, Here to help you record your problems. Type 'quit' or 'exit' to end the conversation."
+        )
+        context = ""
         while True:
-            user_input = input("You: ")
-            if user_input.lower() == "quit":
+            # User Input Message
+            user_input = input("\nUser: ")
+
+            # input_text = f"CLIBot help: {user_input}"
+
+            #############################################################################################################
+
+            # User End Chat - Summarize the User's Problem using ResolveBot
+            if user_input.lower() in ["exit", "quit"]:
+                lines = context.split("\n")
+
+                print(
+                    "################################################################"
+                )
+                print(lines)
+                print(
+                    "################################################################"
+                )
+                # Extract messages that start with "User:"
+                user_messages = [
+                    line.split(": ", 1)[1]
+                    for line in lines
+                    if line.startswith("User: ")
+                ]
+
+                # Concatenate the messages into one string
+                user_messages_concatenated = " ".join(user_messages)
+
+                # Summary of the Problem
+                complaint_summary = summaryBot.get_response(user_messages_concatenated)
+
+                # Save Summary into DataBase
+                Complaint.objects.create(customer=customer, summary=complaint_summary)
+
+                context = ""
+
                 break
 
-            response = chatbot.get_response(user_input)
-            print(f"Chatbot: {response}")
+            #############################################################################################################
 
-            # Log chat message
-            ChatMessage.objects.create(customer=customer, message=user_input)
+            # Chatting With User
+            try:
+                context += f'\nUser: "{user_input}'
 
-        print("Thank you for using the chatbot. Goodbye!")
+                response = chatBot.get_response(user_input)
+                print(f"ResolveBot: {response}")
+                context += f'\nResolveBot: "{response}'
+                ChatMessage.objects.create(customer=customer, message=user_input)
+            except Exception as e:
+                print(f"An error occurred: {str(e)}")
 
-        # At the end of the chat loop in chat.py
-        user_decision = input(
-            "Would you like to file a complaint based on this conversation? (yes/no): "
-        )
-        if user_decision.lower() == "yes":
-            # Here, you would integrate a summarization model or a simple placeholder
-            complaint_summary = "This is a placeholder summary of the customer's issue."
-            # Generate a unique complaint ID (for simplicity, using a UUID here)
-
-            complaint_id = uuid.uuid4()
-            complaint = Complaint.objects.create(
-                customer=customer, summary=complaint_summary
-            )
-            print(f"Complaint filed. Summary: {complaint_summary}")
-            print(f"Your complaint ID is: {complaint_id}")
+        print("🌟 We hope you had a great experience. Have a wonderful day! 🌟")

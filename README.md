@@ -1,14 +1,16 @@
 # Django CLI Chatbot
 
-Welcome to the Django CLI Chatbot, a mystical application designed to engage users in meaningful conversation, gather their precious information, and assist them with their inquiries through the power of Flan-T5 and the Django framework.
+Welcome to the Django CLI Chatbot, a mystical application designed to engage users in meaningful conversation, gather their precious information, and assist them with their inquiries through the advanced capabilities of Flan-T5 and BART models, integrated within a Django framework.
+
 
 ## Introduction
 
-This project conjures a CLI-based chatbot that utilizes the advanced capabilities of Flan-T5 for natural language processing, integrated within a Django application framework. It's designed to simulate a customer service interaction, where it collects user information, handles inquiries, and logs conversations. Complaints are distilled into summaries, each adorned with a unique ID for future reference.
+This project unveils a CLI-based chatbot that leverages the power of Flan-T5 for natural language processing and BART for generating concise summaries, all within a Django application framework. Designed to simulate customer service interactions, it collects user information, handles inquiries, logs conversations, and distills them into summaries, enhancing the user experience with AI-driven insights.
+
 
 ## Setup and Installation
 
-To embark on this journey, you must prepare your environment with the necessary incantations and components.
+Embark on this journey by preparing your environment with the necessary components.
 
 ### Prerequisites
 
@@ -49,10 +51,18 @@ cd chatbot_project
 pip install -r requirements.txt
 ```
 
+### Model Setup
+
+The chatbot utilizes two significant AI models:
+
+- **Flan-T5** for generating responses: This model requires no additional setup other than what's provided by the `transformers` library.
+- **BART** for summarization tasks: Similarly, it's accessed via the `pipeline` function from `transformers`, focusing on summarizing user conversations.
+
+
 ### Database Configuration
 
-1. Brew the MySQL potion to create a new database named `chatbot_db`.
-2. Alter the `settings.py` to reflect your database credentials:
+1. Create a new database named `chatbot_db`.
+2. Update `settings.py` with your database credentials:
 
 ```python
 DATABASES = {
@@ -67,7 +77,7 @@ DATABASES = {
 }
 ```
 
-3. Perform the ancient ritual of migrations:
+3. Apply migrations:
 
 ```python
 python manage.py makemigrations
@@ -76,23 +86,23 @@ python manage.py migrate
 
 ## Usage
 
-To awaken the chatbot, perform the following incantation in your terminal:
+Engage with the chatbot through the terminal:
 
 ```python
 python manage.py chat
 ```
 
-Follow the prompts to engage in conversation, provide your information, and explore the functionalities of the chatbot.
+Interact with the chatbot, provide your information, and explore its functionalities. The chatbot now supports summarizing user messages, utilizing the BART model for enhanced comprehension and summarization.
 
 ## Testing
 
-To ensure the integrity of the spells and components, run the following command:
+Ensure the application's integrity:
 
 ```python
 python manage.py test
 ```
 
-This will invoke the tests written to verify the application's functionalities, including model integrity, command input handling, and data validation.
+This invokes tests verifying the application's functionalities, including model integrity and input handling.
 
 
 ## Contribution
@@ -100,9 +110,10 @@ This will invoke the tests written to verify the application's functionalities, 
 Contributions are welcomed from all corners of the realm. To contribute:
 
 1. Fork the repository.
-2. Create your feature branch (git checkout -b feature/AmazingFeature).
-3. Commit your changes (git commit -am 'Add some AmazingFeature').
-4. Push to the branch (git push origin feature/AmazingFeature).
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`).
+3. Commit your changes (`git commit -am 'Add some AmazingFeature'`).
+4. Push to the branch (`git push origin feature/AmazingFeature`).
 5. Open a Pull Request.
 
-Please ensure your contributions adhere to the project's coding style and standards. All spells and incantations should be thoroughly tested before submission.
+Ensure contributions adhere to the project's standards, thoroughly testing new functionalities.
+
