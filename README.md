@@ -55,8 +55,9 @@ pip install -r requirements.txt
 
 The chatbot utilizes two significant AI models:
 
-- **Flan-T5** for generating responses: This model requires no additional setup other than what's provided by the `transformers` library.
-- **BART** for summarization tasks: Similarly, it's accessed via the `pipeline` function from `transformers`, focusing on summarizing user conversations.
+- **Flan-T5** for generating responses: This model requires no additional setup other than what's provided by the `transformers` library. You can find more information about Flan-T5 [here](https://huggingface.co/google/flan-t5-base?text=I%27m+having+trouble+updating+my+software+help+me).
+
+- **BART** for summarization tasks: Similarly, it's accessed via the `pipeline` function from `transformers`, focusing on summarizing user conversations. More details about the BART model can be found [here](https://huggingface.co/facebook/bart-large-cnn?text=%22Hey+there%21+I%27ve+been+having+some+issues+at+home+and+thought+I%27d+reach+out+for+some+advice.+Well%2C+recently+I%27ve+noticed+a+strange+odor+in+one+of+the+rooms%2C+and+I+can%27t+figure+out+where+it%27s+coming+from.+It%27s+been+bothering+me+for+a+while+now.+I%27ve+checked+everywhere%2C+from+the+kitchen+to+the+bathroom%2C+but+no+luck.+It%27s+not+a+typical+smell+like+rotten+food+or+a+leak.+It%27s+just+odd.%22).
 
 
 ### Database Configuration
