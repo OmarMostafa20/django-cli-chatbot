@@ -66,26 +66,17 @@ class Command(BaseCommand):
             # User Input Message
             user_input = input("\nUser: ")
 
-            # input_text = f"CLIBot help: {user_input}"
-
             #############################################################################################################
 
             # User End Chat - Summarize the User's Problem using ResolveBot
             if user_input.lower() in ["exit", "quit"]:
                 lines = context.split("\n")
 
-                print(
-                    "################################################################"
-                )
-                print(lines)
-                print(
-                    "################################################################"
-                )
                 # Extract messages that start with "User:"
                 user_messages = [
-                    line.split(": ", 1)[1]
-                    for line in lines
-                    if line.startswith("User: ")
+                    message.split('User: "')[1][:-1]
+                    for message in lines
+                    if message.startswith("User:")
                 ]
 
                 # Concatenate the messages into one string
@@ -109,7 +100,7 @@ class Command(BaseCommand):
 
                 response = chatBot.get_response(user_input)
                 print(f"ResolveBot: {response}")
-                context += f'\nResolveBot: "{response}'
+                # context += f'\nResolveBot: "{response}'
                 ChatMessage.objects.create(customer=customer, message=user_input)
             except Exception as e:
                 print(f"An error occurred: {str(e)}")

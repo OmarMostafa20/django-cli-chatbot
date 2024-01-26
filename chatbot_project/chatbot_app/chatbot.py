@@ -1,25 +1,32 @@
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, pipeline
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 
 
 class ChatBot:
     def __init__(self):
-        self.model_name = "google/flan-t5-base"
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
-
-    def get_response(self, context):
-        # Encode and generate response
-        context_ids = self.tokenizer.encode(context, return_tensors="pt")
-        output_ids = self.model.generate(
-            context_ids,
-            max_length=512,
-            num_return_sequences=1,
-            temperature=0.7,
-            do_sample=True,
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            "facebook/blenderbot-400M-distill"
         )
-        response = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(
+            "facebook/blenderbot-400M-distill"
+        )
 
-        return response
+    def get_response(self, message):
+        # Tokenize the input message
+        inputs = self.tokenizer([message], return_tensors="pt")
+
+        # Generate a response
+        reply_ids = self.model.generate(
+            **inputs,
+            max_length=1000,
+            do_sample=True,  # Enable sampling
+            temperature=0.7,  # Control randomness
+            top_k=0,  # Optionally control the number of highest probability vocabulary tokens to keep for top-k-filtering
+            num_return_sequences=1,  # Number of sequences to generate (you can generate more than one for varied responses)
+        )
+
+        # Decode and print the response
+        response = self.tokenizer.batch_decode(reply_ids, skip_special_tokens=True)
+        return response[0]
 
 
 class SummaryBot:
