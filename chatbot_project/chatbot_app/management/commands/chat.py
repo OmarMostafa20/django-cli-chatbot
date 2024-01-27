@@ -82,8 +82,15 @@ class Command(BaseCommand):
                 # Concatenate the messages into one string
                 user_messages_concatenated = " ".join(user_messages)
 
-                # Summary of the Problem
-                complaint_summary = summaryBot.get_response(user_messages_concatenated)
+                # Check the length of the concatenated messages
+                if len(user_messages_concatenated) <= 150:
+                    # If the messages are short enough, save them directly
+                    complaint_summary = user_messages_concatenated
+                else:
+                    # If the messages are too long, get a summary
+                    complaint_summary = summaryBot.get_response(
+                        user_messages_concatenated
+                    )
 
                 # Save Summary into DataBase
                 Complaint.objects.create(customer=customer, summary=complaint_summary)
@@ -103,6 +110,6 @@ class Command(BaseCommand):
                 # context += f'\nResolveBot: "{response}'
                 ChatMessage.objects.create(customer=customer, message=user_input)
             except Exception as e:
-                print(f"An error occurred: {str(e)}")
+                print(f"Don't consider this note and continue the chat.")
 
         print("🌟 We hope you had a great experience. Have a wonderful day! 🌟")
